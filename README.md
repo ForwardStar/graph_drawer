@@ -18,3 +18,10 @@ Then write your edge information into ``graph.txt``. For example:
 ```
 
 This will return a triangular graph.
+
+Then run the program:
+```sh
+python -u main.py graph.txt
+```
+
+This will return a file ``graph.png``.
