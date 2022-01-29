@@ -18,9 +18,9 @@ def LaTeXCode(EdgeSet):
 
     for (u, v, t) in EdgeSet:
         if VertexIdx[u] + VertexIdx[v] == len(VertexSet):
-            GraphMeta += "  \draw (" + str(u) + ") -- node[left, midway] {" + str(t) + "} (" + str(v) + ");\n"
+            GraphMeta += "  \draw (" + str(u) + ") -- node[left] {" + str(t) + "} (" + str(v) + ");\n"
         else:
-            GraphMeta += "  \draw (" + str(u) + ") -- node[above, midway] {" + str(t) + "} (" + str(v) + ");\n"
+            GraphMeta += "  \draw (" + str(u) + ") -- node[above] {" + str(t) + "} (" + str(v) + ");\n"
     
     for u in VertexSet:
         GraphMeta += "  \\node at (" + str(u) + ")[main]{$v_" + str(u) + "$};\n"
@@ -81,8 +81,11 @@ try:
     from pdf2image import convert_from_path
 except:
     print("Installing dependencies...")
-    from pip._internal import main
-    main(['install', 'pdf2image'])
+    try:
+        from pip._internal import main
+        main(['install', 'pdf2image'])
+    except:
+        os.system("pip3 install pdf2image")
     from pdf2image import convert_from_path
 
 def generate():
