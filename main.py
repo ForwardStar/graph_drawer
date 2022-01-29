@@ -27,18 +27,26 @@ def LaTeXCode(EdgeSet):
         + "\end{tikzpicture}\n" \
         + "\end{figure}\n"
 
+import sys
 EdgeSet = []
 try:
-    with open("graph.txt", "r") as f:
+    GraphFile = "graph.txt"
+    if len(sys.argv) == 2:
+        GraphFile = sys.argv[1]
+    with open(GraphFile, "r") as f:
         while True:
-            try:
-                u, v, t = f.readline().split()
-                u = int(u)
-                v = int(v)
-                t = int(t)
-                EdgeSet.append((u, v, t))
-            except:
+            text = f.readline().split()
+            if len(text) == 0:
                 break
+            if len(text) != 2 and len(text) != 3:
+                print("Invalid format of input file.")
+            u = text[0]
+            v = text[1]
+            if len(text) == 3:
+                t = text[2]
+            else:
+                t = ""
+            EdgeSet.append((u, v, t))
 except:
     print("Please create a 'graph.txt' file. Write graph data in the format (u, v, w) in it.")
     print("Sample:")
@@ -83,3 +91,7 @@ generate()
 for file in os.listdir(tempPath):
     os.remove(os.path.join(tempPath, file))
 os.rmdir(tempPath)
+
+from PIL import Image
+img = Image.open("graph.png")
+img.show()
