@@ -17,7 +17,7 @@ def LaTeXCode(EdgeSet):
         count += 1
 
     for (u, v, t) in EdgeSet:
-        if len(VertexSet) - max(VertexIdx[u], VertexIdx[v]) == min(VertexIdx[u], VertexIdx[v]):
+        if VertexIdx[u] + VertexIdx[v] == len(VertexSet):
             GraphMeta += "  \draw (" + str(u) + ") -- node[left, midway] {" + str(t) + "} (" + str(v) + ");\n"
         else:
             GraphMeta += "  \draw (" + str(u) + ") -- node[above, midway] {" + str(t) + "} (" + str(v) + ");\n"
