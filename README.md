@@ -24,4 +24,6 @@ Then run the program:
 python -u main.py graph.txt
 ```
 
-This will return a file ``graph.png``.
+This will return a file ``graph.png``:
+
+![](graph.png)
