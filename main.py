@@ -1,6 +1,7 @@
 def LaTeXCode(EdgeSet):
     GraphMeta = ""
     VertexSet = []
+    VertexIdx = {}
 
     for (u, v, t) in EdgeSet:
         if u not in VertexSet:
@@ -12,10 +13,14 @@ def LaTeXCode(EdgeSet):
     for u in VertexSet:
         GraphMeta += "  \coordinate[] (" + str(u) + ") at (" + str(count / len(VertexSet) * 360) + ":3);\n"
         GraphMeta += "  \\node at (" + str(u) + ")[main]{$v_" + str(u) + "$};\n"
+        VertexIdx[u] = count
         count += 1
 
     for (u, v, t) in EdgeSet:
-        GraphMeta += "  \draw (" + str(u) + ") -- node[above, midway] {" + str(t) + "} (" + str(v) + ");\n" 
+        if len(VertexSet) - max(VertexIdx[u], VertexIdx[v]) == min(VertexIdx[u], VertexIdx[v]):
+            GraphMeta += "  \draw (" + str(u) + ") -- node[left, midway] {" + str(t) + "} (" + str(v) + ");\n"
+        else:
+            GraphMeta += "  \draw (" + str(u) + ") -- node[above, midway] {" + str(t) + "} (" + str(v) + ");\n"
     
     for u in VertexSet:
         GraphMeta += "  \\node at (" + str(u) + ")[main]{$v_" + str(u) + "$};\n"
