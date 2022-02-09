@@ -27,3 +27,20 @@ python -u main.py graph.txt
 This will return a file ``graph.png``:
 
 ![](graph.png)
+
+## 10/02/2022 Update:
+Now you can use the program to draw a tree:
+```
+1 2 1
+1 3 2
+2 4 2
+2 5 3
+3 6 3
+3 7 2
+1 9 1
+2 8 2
+```
+
+This will return a tree:
+
+![](graph_tree.png)
