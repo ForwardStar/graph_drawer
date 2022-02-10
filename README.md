@@ -23,16 +23,7 @@ This will return a file ``graph.png``:
 
 ![](graph.png)
 
-## Installation from source
-
-```sh
-git clone https://github.com/ForwardStar/graph_drawer.git
-cd graph_drawer
-python setup.py install
-```
-
-## 10/02/2022 Update:
-Now you can use the program to draw a tree:
+Or to draw a tree:
 ```
 1 2 1
 1 3 2
@@ -47,3 +38,11 @@ Now you can use the program to draw a tree:
 This will return a tree:
 
 ![](graph_tree.png)
+
+# Installation from source
+
+```sh
+git clone https://github.com/ForwardStar/graph_drawer.git
+cd graph_drawer
+python setup.py install
+```
