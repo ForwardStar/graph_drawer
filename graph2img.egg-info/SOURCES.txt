@@ -1,0 +1,9 @@
+LICENSE
+README.md
+setup.py
+graph2img.egg-info/PKG-INFO
+graph2img.egg-info/SOURCES.txt
+graph2img.egg-info/dependency_links.txt
+graph2img.egg-info/entry_points.txt
+graph2img.egg-info/requires.txt
+graph2img.egg-info/top_level.txt

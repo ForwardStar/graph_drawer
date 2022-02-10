@@ -5,7 +5,7 @@ with open("README.md", "r", encoding='utf-8') as fh:
 
 setuptools.setup(
   name="graph2img",
-  version="1.0.0",
+  version="1.0.1",
   author="Haoxuan Xie",
   author_email="haoxuanxie@link.cuhk.edu.cn",
   url="https://github.com/ForwardStar/graph_drawer",
@@ -23,7 +23,7 @@ setuptools.setup(
   python_requires='>=3.6',
   entry_points={
       'console_scripts': [
-          'graph2img = main:main'
+          'graph2img = graph2img:main'
       ]
   },
 )

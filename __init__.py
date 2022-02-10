@@ -242,6 +242,3 @@ def main():
     from PIL import Image
     img = Image.open("graph.png")
     img.show()
-
-if __name__ == "__main__":
-    main()
