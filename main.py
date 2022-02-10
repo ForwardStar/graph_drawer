@@ -1,6 +1,3 @@
-from asyncio.windows_events import NULL
-
-
 def LaTeXCode(EdgeSet, radius=3, isTree=False, root=None):
 
     class Tree:
@@ -144,7 +141,7 @@ def isTree(EdgeSet):
     if len(EdgeSet) + 1 == len(VertexSet):
         return isConnected(VertexSet, EdgeSet)
 
-if __name__ == "__main__":
+def main():
     import sys
 
     save_temp_files = False
@@ -212,6 +209,10 @@ if __name__ == "__main__":
     with open("temp/graph.tex", "w") as f:
         f.writelines(completeLaTeXCode)
 
+    os.system("xelatex --version > temp/info.log")
+    with open("temp/info.log", "r") as file:
+        if not file.readline().startswith("XeTeX"):
+            raise ModuleNotFoundError("xelatex not found on your machine!")
     os.system("xelatex -output-directory=temp temp/graph.tex > temp/info.log")
 
     try:
@@ -241,3 +242,6 @@ if __name__ == "__main__":
     from PIL import Image
     img = Image.open("graph.png")
     img.show()
+
+if __name__ == "__main__":
+    main()

@@ -1,4 +1,27 @@
-# graph_drawer
+# Installation by pip
+
+Install with pip:
+```sh
+pip install graph2img
+```
+
+Then write your edge information into ``graph.txt``. For example:
+```
+1 2 1
+2 3 2
+1 3 3
+```
+
+and run with:
+```sh
+graph2img graph.txt
+```
+
+This will return a file ``graph.png``:
+
+![](graph.png)
+
+# Installation from source
 Draw graphs according to edges input.
 
 You need to install xelatex before use.
