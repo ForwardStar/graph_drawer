@@ -1,4 +1,4 @@
-def LaTeXCode(EdgeSet, radius=3, isTree=False, root=None):
+def LaTeXCode(EdgeSet, radius=3, isTree=False, isLine=False, root=None):
 
     class Tree:
         def __init__(self, root, Vertex, Edge):
@@ -37,8 +37,25 @@ def LaTeXCode(EdgeSet, radius=3, isTree=False, root=None):
             VertexSet.append(u)
         if v not in VertexSet:
             VertexSet.append(v)
+    
+    if isLine:
+        last = None
+        last_dict = dict()
+        for u in VertexSet:
+            if last is None:
+                last_dict[u] = None
+                GraphMeta += "  \\node[node distance={20mm}, main] (" + str(u) + ") {$v_{" + str(u) + "}$};\n"
+            else:
+                last_dict[u] = last
+                GraphMeta += "  \\node[node distance={20mm}, main] (" + str(u) + ") [right of=" + str(last) + "] {$v_{" + str(u) + "}$};\n"
+            last = u
+        for (u, v, t) in EdgeSet:
+            if last_dict[u] == v or last_dict[v] == u:
+                GraphMeta += "  \draw (" + str(u) + ") -- node[above] {" + str(t) + "} (" + str(v) + ");\n"
+            else:
+                GraphMeta += "  \draw (" + str(u) + ") to [bend left] node[above] {" + str(t) + "} (" + str(v) + ");\n"
 
-    if isTree:
+    elif isTree:
         Temp = dict()
         for (u, v, t) in EdgeSet:
             if u not in Temp:
@@ -54,19 +71,19 @@ def LaTeXCode(EdgeSet, radius=3, isTree=False, root=None):
             root = VertexSet[0]
         Graph = Tree(root, VertexSet, EdgeSet)
         Queue = [root]
-        GraphMeta += "\\node[main] (" + str(root) + ") {$v_{" + str(root) + "}$};\n"
+        GraphMeta += "  \\node[main] (" + str(root) + ") {$v_{" + str(root) + "}$};\n"
         while Queue:
             u = Queue.pop(0)
-            GraphMeta += "\\node[node distance={15mm}] (" + str(u * 100) + ") [below of=" + str(u) + "] {" + "};\n"
+            GraphMeta += "  \\node[node distance={15mm}] (" + str(u * 100) + ") [below of=" + str(u) + "] {" + "};\n"
             left_last = str(u * 100)
             right_last = str(u * 100)
             count = 0
             for (v, t) in Graph.edge[u]:
                 if count % 2 == 0:
-                    GraphMeta += "\\node[node distance={" + str(Graph.num[v] * 10) + "mm}, main] (" + str(v) + ") [left of=" + str(left_last) + "] {$v_{" + str(v) + "}$};\n"
+                    GraphMeta += "  \\node[node distance={" + str(Graph.num[v] * 10) + "mm}, main] (" + str(v) + ") [left of=" + str(left_last) + "] {$v_{" + str(v) + "}$};\n"
                     left_last = v
                 else:
-                    GraphMeta += "\\node[node distance={" + str(Graph.num[v] * 10) + "mm}, main] (" + str(v) + ") [right of=" + str(right_last) + "] {$v_{" + str(v) + "}$};\n"
+                    GraphMeta += "  \\node[node distance={" + str(Graph.num[v] * 10) + "mm}, main] (" + str(v) + ") [right of=" + str(right_last) + "] {$v_{" + str(v) + "}$};\n"
                     right_last = v
                 GraphMeta += "  \draw (" + str(u) + ") -- node[left] {" + str(t) + "} (" + str(v) + ");\n"
                 Queue.append(v)
@@ -192,11 +209,14 @@ def main():
             root = None
         completeLaTeXCode = LaTeXCode(EdgeSet, isTree=True, root=root)
     else:
-        try:
-            radius = int(input("Input the radius of the graph: "))
-        except:
-            radius = 3
-        completeLaTeXCode = LaTeXCode(EdgeSet, radius)
+        if input("Draw in a circle or a line? (circle/line): ").strip() == "line":
+            completeLaTeXCode = LaTeXCode(EdgeSet, isLine=True)
+        else:
+            try:
+                radius = int(input("Input the radius of the graph: "))
+            except:
+                radius = 3
+            completeLaTeXCode = LaTeXCode(EdgeSet, radius)
 
     completeLaTeXCode = "\\documentclass[tikz]{standalone}\n" \
         + "\\usepackage{tikz}\n" \
