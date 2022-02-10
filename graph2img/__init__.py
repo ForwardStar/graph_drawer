@@ -120,8 +120,8 @@ def isConnected(VertexSet, EdgeSet):
             root = None
             for key in self.parent.keys():
                 if root is None:
-                    root = self.parent[key]
-                elif root != self.parent[key]:
+                    root = self.find(key)
+                elif root != self.find(key):
                     return False
             return True
     
@@ -140,6 +140,8 @@ def isTree(EdgeSet):
     
     if len(EdgeSet) + 1 == len(VertexSet):
         return isConnected(VertexSet, EdgeSet)
+    
+    return False
 
 def main():
     import sys
