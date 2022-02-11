@@ -233,7 +233,7 @@ def main():
 
     os.system("xelatex --version > temp/info.log")
     with open("temp/info.log", "r", encoding='utf-8') as file:
-        if "XeTeX" in str(file.readline()):
+        if "XeTeX" not in str(file.readline()):
             raise ModuleNotFoundError("xelatex not found on your machine!")
     os.system("xelatex -output-directory=temp temp/graph.tex > temp/info.log")
 

@@ -5,7 +5,7 @@ with open("README.md", "r", encoding='utf-8') as fh:
 
 setuptools.setup(
   name="graph2img",
-  version="1.1.1",
+  version="1.1.2",
   author="Haoxuan Xie",
   author_email="haoxuanxie@link.cuhk.edu.cn",
   url="https://github.com/ForwardStar/graph_drawer",
