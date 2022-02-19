@@ -88,7 +88,7 @@ def install_pdf2svg():
         raise SystemError("error detecting system information:", system_info)
 
     with open(os.path.join(__file__[:-11], 'pdf2svg') + "/install.sh", "w", encoding='utf-8') as f:
-        f.writelines("chmod 755 " + path + " && " +
+        f.writelines("chmod 755 -R " + path + " && " +
                     "cd " + path + "pdf2svg-master/ && " +
                     "./configure --prefix=" + path + " && " +
                     "make && " +
