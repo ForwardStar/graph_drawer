@@ -2,6 +2,8 @@ LICENSE
 README.md
 setup.py
 graph2img/__init__.py
+graph2img/_generate_LaTeX_code.py
+graph2img/_graph_functions.py
 graph2img.egg-info/PKG-INFO
 graph2img.egg-info/SOURCES.txt
 graph2img.egg-info/dependency_links.txt

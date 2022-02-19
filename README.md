@@ -21,7 +21,7 @@ graph2img graph.txt
 
 This will return a file ``graph.png``:
 
-![](graph.png)
+![](https://raw.githubusercontent.com/ForwardStar/graph_drawer/main/graph.png)
 
 Or to draw a tree:
 ```
@@ -37,7 +37,19 @@ Or to draw a tree:
 
 This will return a tree:
 
-![](graph_tree.png)
+![](https://github.com/ForwardStar/graph_drawer/blob/main/graph_tree.png)
+
+# Options
+
+Two options are provided:
+```
+--save-temp-files=true/false
+--output-format=png/svg
+```
+
+If you want to save the temporary files (like tex codes), set ``--save-temp-files`` as ``true``;
+
+If you want to generate a svg format image, set ``-output-format`` as ``svg``.
 
 # Installation from source
 

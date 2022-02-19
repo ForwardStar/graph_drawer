@@ -5,11 +5,11 @@ with open("README.md", "r", encoding='utf-8') as fh:
 
 setuptools.setup(
   name="graph2img",
-  version="1.1.2",
+  version="1.2.1",
   author="Haoxuan Xie",
   author_email="haoxuanxie@link.cuhk.edu.cn",
   url="https://github.com/ForwardStar/graph_drawer",
-  py_modules=["graph2img.__init__"],
+  py_modules=["graph2img.__init__", "graph2img._generate_LaTeX_code", "graph2img._graph_functions"],
   description="graph2img: convert a graph to a png file.",
   long_description=long_description,
   long_description_content_type="text/markdown",

@@ -1,178 +1,133 @@
-def LaTeXCode(EdgeSet, radius=3, isTree=False, isLine=False, root=None):
+from ._graph_functions import isTree
+from ._generate_LaTeX_code import LaTeXCode
+import sys
+import os
 
-    class Tree:
-        def __init__(self, root, Vertex, Edge):
-            Queue = [root]
-            Visited = set()
-            self.vertex = Vertex
-            self.edge = dict()
-            while Queue:
-                u = Queue.pop(0)
-                Visited.add(u)
-                self.edge[u] = []
-                for (v, t) in Edge[u]:
-                    if v not in Visited:
-                        self.edge[u].append((v, t))
-                        Queue.append(v)
-            self.num = dict()
-            self.countNodes(root)
-            for key in self.edge.keys():
-                def firstElem(elem):
-                    return self.num[elem[0]]
-                self.edge[key].sort(key=firstElem)
+'''
+headers = {'User-Agent':'Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.6) Gecko/20091201 Firefox/3.5.6'}
+
+def download(url, path):
+
+    from tqdm import tqdm
+    from urllib.request import urlopen, Request
+    blocksize = 1024 * 8
+    blocknum = 0
+    retry_times = 0
+    while True:
+        try:
+            with urlopen(Request(url, headers=headers), timeout=3) as resp:
+                total = resp.info().get("content-length", None)
+                with tqdm(
+                    unit="B",
+                    unit_scale=True,
+                    miniters=1,
+                    unit_divisor=1024,
+                    total=total if total is None else int(total),
+                ) as t, path.open("wb") as f:
+                    block = resp.read(blocksize)
+                    while block:
+                        f.write(block)
+                        blocknum += 1
+                        t.update(len(block))
+                        block = resp.read(blocksize)
+            break
+        except KeyboardInterrupt:
+            if path.is_file():
+                path.unlink()
+            raise
+        except:
+            retry_times += 1
+            if retry_times >= 20:
+                break
+            print("Timed out, retrying...")
+    if retry_times >= 20:
+        if path.is_file():
+            path.unlink()
+        raise ConnectionError("bad internet connection, check it and retry.")
+
+
+def install_pdf2svg():
+
+    print("Installing necessary components...")
+
+    try:
+        import requests
+    except:
+        print("Installing dependencies...")
+        try:
+            from pip._internal import main
+            main(['install', 'requests'])
+        except:
+            os.system("pip3 install requests")
+        import requests
+
+    from pathlib2 import Path
+    import re, platform
+    system_info = platform.architecture()
+
+    if system_info[1] == 'WindowsPE':
+        path = os.path.join(__file__[:-11], 'pdf2svg')
+        base_url = "https://github.com/jalios/pdf2svg-windows/tree/master/"
+        reg = None
+        if system_info[0] == '32bit':
+            base_url += "dist-32bits"
+            reg = r'/jalios/pdf2svg-windows/blob/master/dist-32bits/[\w\-\_\+]+\.dll|/jalios/pdf2svg-windows/blob/master/dist-32bits/[\w\-\_\+]+\.exe'
+        elif system_info[0] == '64bit':
+            base_url += "dist-64bits"
+            reg = r'/jalios/pdf2svg-windows/blob/master/dist-64bits/[\w\-\_\+]+\.dll|/jalios/pdf2svg-windows/blob/master/dist-64bits/[\w\-\_\+]+\.exe'
+        else:
+            os.rmdir(path)
+            raise SystemError("error detecting system information:", system_info)
         
-        def countNodes(self, root):
-            self.num[root] = 1
-            for (v, t) in self.edge[root]:
-                self.num[root] += self.countNodes(v)
-            return self.num[root]
-            
-
-    GraphMeta = ""
-    VertexSet = []
-    VertexIdx = {}
-
-    for (u, v, t) in EdgeSet:
-        if u not in VertexSet:
-            VertexSet.append(u)
-        if v not in VertexSet:
-            VertexSet.append(v)
+        web_contents = requests.session().get(base_url, headers=headers).content.decode('utf-8')
+        files = re.compile(reg).findall(web_contents)
+        for file in files:
+            file = file.replace('blob', 'raw')
+            url = "https://github.com" + file
+            file = file.split('/')
+            try:
+                print("Downloading", file[-1])
+                download(url, Path(os.path.join(path, file[-1])))
+            except:
+                os.rmdir(path)
     
-    if isLine:
-        last = None
-        last_dict = dict()
-        for u in VertexSet:
-            if last is None:
-                last_dict[u] = None
-                GraphMeta += "  \\node[node distance={20mm}, main] (" + str(u) + ") {$v_{" + str(u) + "}$};\n"
-            else:
-                last_dict[u] = last
-                GraphMeta += "  \\node[node distance={20mm}, main] (" + str(u) + ") [right of=" + str(last) + "] {$v_{" + str(u) + "}$};\n"
-            last = u
-        for (u, v, t) in EdgeSet:
-            if last_dict[u] == v or last_dict[v] == u:
-                GraphMeta += "  \draw (" + str(u) + ") -- node[above] {" + str(t) + "} (" + str(v) + ");\n"
-            else:
-                GraphMeta += "  \draw (" + str(u) + ") to [bend left] node[above] {" + str(t) + "} (" + str(v) + ");\n"
-
-    elif isTree:
-        Temp = dict()
-        for (u, v, t) in EdgeSet:
-            if u not in Temp:
-                Temp[u] = [(v, t)]
-            else:
-                Temp[u].append((v, t))
-            if v not in Temp:
-                Temp[v] = [(u, t)]
-            else:
-                Temp[v].append((u, t))
-        EdgeSet = Temp
-        if root not in Temp:
-            root = VertexSet[0]
-        Graph = Tree(root, VertexSet, EdgeSet)
-        Queue = [root]
-        GraphMeta += "  \\node[main] (" + str(root) + ") {$v_{" + str(root) + "}$};\n"
-        while Queue:
-            u = Queue.pop(0)
-            GraphMeta += "  \\node[node distance={15mm}] (" + str(u * 100) + ") [below of=" + str(u) + "] {" + "};\n"
-            left_last = str(u * 100)
-            right_last = str(u * 100)
-            count = 0
-            for (v, t) in Graph.edge[u]:
-                if count % 2 == 0:
-                    GraphMeta += "  \\node[node distance={" + str(Graph.num[v] * 10) + "mm}, main] (" + str(v) + ") [left of=" + str(left_last) + "] {$v_{" + str(v) + "}$};\n"
-                    left_last = v
-                else:
-                    GraphMeta += "  \\node[node distance={" + str(Graph.num[v] * 10) + "mm}, main] (" + str(v) + ") [right of=" + str(right_last) + "] {$v_{" + str(v) + "}$};\n"
-                    right_last = v
-                GraphMeta += "  \draw (" + str(u) + ") -- node[left] {" + str(t) + "} (" + str(v) + ");\n"
-                Queue.append(v)
-                count += 1
+    elif system_info[1] == 'ELF':
+        os.rmdir(path)
+        raise SystemError("error detecting system information:", system_info)
 
     else:
-        count = 0
-        for u in VertexSet:
-            GraphMeta += "  \coordinate[] (" + str(u) + ") at (" + str(count / len(VertexSet) * 360) + ":" + str(radius) + ");\n"
-            GraphMeta += "  \\node at (" + str(u) + ")[main]{$v_{" + str(u) + "}$};\n"
-            VertexIdx[u] = count
-            count += 1
+        os.rmdir(path)
+        raise SystemError("error detecting system information:", system_info)
+'''
 
-        for (u, v, t) in EdgeSet:
-            if VertexIdx[u] + VertexIdx[v] == len(VertexSet):
-                GraphMeta += "  \draw (" + str(u) + ") -- node[left] {" + str(t) + "} (" + str(v) + ");\n"
-            else:
-                GraphMeta += "  \draw (" + str(u) + ") -- node[above] {" + str(t) + "} (" + str(v) + ");\n"
-        
-        for u in VertexSet:
-            GraphMeta += "  \\node at (" + str(u) + ")[main]{$v_{" + str(u) + "}$};\n"
-
-    return "\\begin{figure}\n" \
-        + "\centering\n" \
-        + "\\begin{tikzpicture}[main/.style = {draw, circle, fill=white}]\n" \
-        + GraphMeta \
-        + "\end{tikzpicture}\n" \
-        + "\end{figure}\n"
-
-def isConnected(VertexSet, EdgeSet):
-
-    class DisjointSet:
-        def __init__(self, Vertex, Edge=None):
-            self.parent = dict()
-            for u in Vertex:
-                self.parent[u] = u
-            if Edge:
-                for (u, v, t) in Edge:
-                    if self.find(u) != self.find(v):
-                        self.union(u, v)
-        
-        def find(self, u):
-            if self.parent[u] != u:
-                self.parent[u] = self.find(self.parent[u])
-            return self.parent[u]
-        
-        def union(self, u, v):
-            self.parent[self.parent[v]] = self.parent[u]
-        
-        def isConnected(self):
-            root = None
-            for key in self.parent.keys():
-                if root is None:
-                    root = self.find(key)
-                elif root != self.find(key):
-                    return False
-            return True
+def check_optional():
     
-    return DisjointSet(VertexSet, EdgeSet).isConnected()
-
-    
-def isTree(EdgeSet):
-
-    VertexSet = []
-
-    for (u, v, t) in EdgeSet:
-        if u not in VertexSet:
-            VertexSet.append(u)
-        if v not in VertexSet:
-            VertexSet.append(v)
-    
-    if len(EdgeSet) + 1 == len(VertexSet):
-        return isConnected(VertexSet, EdgeSet)
-    
-    return False
-
-def main():
-    import sys
-
     save_temp_files = False
+    output_format = 'png'
+
     for argv in sys.argv:
-        if argv.startswith('--') and argv != '--save-temp-files':
-            print("Unrecognized interpreter option:", argv)
-            exit()
-        if argv == '--save-temp-files':
-            save_temp_files = True
-            sys.argv.remove(argv)
+        if argv.startswith('--'):
+            if argv == '--save-temp-files=true':
+                save_temp_files = True
+                sys.argv.remove(argv)
+            elif argv.startswith('--output-format='):
+                output_format = argv[9:]
+                sys.argv.remove(argv)
+            else:
+                print("Unrecognized interpreter option:", argv)
+                exit()
+
+    if output_format != 'png' and output_format != 'svg':
+        print("Unrecognized format:", output_format)
+        exit()
+    
+    return save_temp_files, output_format
+
+
+def read_graph():
 
     EdgeSet = []
+
     try:
         GraphFile = "graph.txt"
         if len(sys.argv) >= 2:
@@ -200,6 +155,11 @@ def main():
         print("This will return a triangular graph.")
         exit()
 
+    return EdgeSet
+
+
+def generate_code(EdgeSet):
+
     completeLaTeXCode = ""
 
     if isTree(EdgeSet) and input("This is a tree. Do you want to draw it as a tree structure? (y/n) ").strip() == 'y':
@@ -218,14 +178,17 @@ def main():
                 radius = 3
             completeLaTeXCode = LaTeXCode(EdgeSet, radius)
 
-    completeLaTeXCode = "\\documentclass[tikz]{standalone}\n" \
+    return "\\documentclass[tikz]{standalone}\n" \
         + "\\usepackage{tikz}\n" \
         + "\\begin{document}\n" \
         + completeLaTeXCode \
         + "\end{document}\n"
 
-    import os
-    tempPath = "temp"
+
+def generate_temp_path(completeLaTeXCode):
+    
+    tempPath = 'temp'
+
     if not os.path.exists(tempPath):
         os.mkdir(tempPath)
     with open("temp/graph.tex", "w") as f:
@@ -237,24 +200,55 @@ def main():
             raise ModuleNotFoundError("xelatex not found on your machine!")
     os.system("xelatex -output-directory=temp temp/graph.tex > temp/info.log")
 
-    try:
-        from pdf2image import convert_from_path
-    except:
-        print("Installing dependencies...")
-        try:
-            from pip._internal import main
-            main(['install', 'pdf2image'])
-        except:
-            os.system("pip3 install pdf2image")
-        from pdf2image import convert_from_path
+    return tempPath
 
-    def generate():
+
+def generate_figure(tempPath, output_format):
+
+    if output_format == 'svg':
+        '''
+        path = os.path.join(__file__[:-11], 'pdf2svg')
+        if not os.path.exists(path):
+            os.mkdir(path)
+            install_pdf2svg()
+        os.system(path + "/pdf2svg.exe temp/graph.pdf graph.svg")
+        '''
+        os.system("pdf2svg > temp/info.log")
+        with open("temp/info.log", "r", encoding='utf-8') as file:
+            if not file.readline().startswith('Usage'):
+                raise ModuleNotFoundError("pdf2svg not found on your machine, install from https://github.com/dawbarton/pdf2svg before use.")
+        os.system("pdf2svg temp/graph.pdf graph.svg")
+
+    if output_format == 'png':
+        try:
+            from pdf2image import convert_from_path
+        except:
+            print("Installing dependencies...")
+            try:
+                from pip._internal import main
+                main(['install', 'pdf2image'])
+            except:
+                os.system("pip3 install pdf2image")
+            from pdf2image import convert_from_path
+
         images_from_path = convert_from_path("temp/graph.pdf", output_folder=tempPath, dpi=360)
         for image in images_from_path:
             if images_from_path.index(image) == 1:
                 image.save("graph.png", 'PNG')
 
-    generate()
+
+def main(save_temp_files=False, output_format='png'):
+
+    if save_temp_files == False and output_format == 'png':
+        save_temp_files, output_format = check_optional()
+    
+    EdgeSet = read_graph()
+
+    completeLaTeXCode = generate_code(EdgeSet)
+
+    tempPath = generate_temp_path(completeLaTeXCode)
+
+    generate_figure(tempPath, output_format)
 
     if not save_temp_files:
         for file in os.listdir(tempPath):
