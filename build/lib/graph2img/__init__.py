@@ -3,7 +3,6 @@ from ._generate_LaTeX_code import LaTeXCode
 import sys
 import os
 
-'''
 headers = {'User-Agent':'Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.6) Gecko/20091201 Firefox/3.5.6'}
 
 def download(url, path):
@@ -62,6 +61,40 @@ def install_pdf2svg():
         import requests
 
     from pathlib2 import Path
+    import zipfile
+
+    url = "https://github.com/dawbarton/pdf2svg/archive/refs/heads/master.zip"
+    print("Downloading pdf2svg.zip...")
+    path = os.path.join(__file__[:-11], 'pdf2svg.zip')
+    download(url, Path(path))
+
+    zip_file = zipfile.ZipFile(path, 'r')
+    path = os.path.join(__file__[:-11], 'pdf2svg')
+    zip_file.extractall(path)
+
+    import platform
+    system_info = platform.architecture()
+
+    if system_info[1] == 'WindowsPE':
+        path =  __file__[:-11].replace('\\', '/')
+        path = path[0].lower() + path[2:]
+        path = '/mnt/' + path + 'pdf2svg/'
+    
+    elif system_info[1] == 'ELF':
+        path = __file__[:-11] + 'pdf2svg/'
+    
+    else:
+        os.rmdir(os.path.join(__file__[:-11], 'pdf2svg'))
+        raise SystemError("error detecting system information:", system_info)
+
+    with open(os.path.join(__file__[:-11], 'pdf2svg') + "/install.sh", "w", encoding='utf-8') as f:
+        f.writelines("cd " + path + "pdf2svg-master/ &&" +
+                    "./configure --prefix=" + path + "&&" +
+                    "make &&" +
+                    "make install")
+    os.system("bash " + path + "install.sh")
+
+    '''
     import re, platform
     system_info = platform.architecture()
 
@@ -98,7 +131,7 @@ def install_pdf2svg():
     else:
         os.rmdir(path)
         raise SystemError("error detecting system information:", system_info)
-'''
+    '''
 
 def check_optional():
     
@@ -206,18 +239,15 @@ def generate_temp_path(completeLaTeXCode):
 def generate_figure(tempPath, output_format):
 
     if output_format == 'svg':
-        '''
         path = os.path.join(__file__[:-11], 'pdf2svg')
         if not os.path.exists(path):
             os.mkdir(path)
             install_pdf2svg()
-        os.system(path + "/pdf2svg.exe temp/graph.pdf graph.svg")
-        '''
         os.system("pdf2svg > temp/info.log")
         with open("temp/info.log", "r", encoding='utf-8') as file:
             if not file.readline().startswith('Usage'):
                 raise ModuleNotFoundError("pdf2svg not found on your machine, install from https://github.com/dawbarton/pdf2svg before use.")
-        os.system("pdf2svg temp/graph.pdf graph.svg")
+        os.system("pdf2svg temp/graph.pdf graph.svg all")
 
     if output_format == 'png':
         try:
@@ -255,6 +285,7 @@ def main(save_temp_files=False, output_format='png'):
             os.remove(os.path.join(tempPath, file))
         os.rmdir(tempPath)
 
-    from PIL import Image
-    img = Image.open("graph.png")
-    img.show()
+    if output_format == 'png':
+        from PIL import Image
+        img = Image.open("graph.png")
+        img.show()
