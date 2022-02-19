@@ -1,3 +1,19 @@
+# Prerequisite
+
+``xelatex`` and ``pdf2svg``. Installation on Linux:
+
+```sh
+# Ubuntu
+sudo apt-get install texlive-xetex
+sudo apt-get install pdf2svg
+```
+
+```sh
+# CentOS
+yum install texlive-xetex
+yum install pdf2svg
+```
+
 # Installation by pip
 
 Install with pip:

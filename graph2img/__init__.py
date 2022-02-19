@@ -61,42 +61,7 @@ def install_pdf2svg():
         import requests
 
     from pathlib2 import Path
-    import zipfile
-
-    url = "https://github.com/dawbarton/pdf2svg/archive/refs/heads/master.zip"
-    print("Downloading pdf2svg.zip...")
-    path = os.path.join(__file__[:-11], 'pdf2svg.zip')
-    download(url, Path(path))
-
-    zip_file = zipfile.ZipFile(path, 'r')
-    path = os.path.join(__file__[:-11], 'pdf2svg')
-    zip_file.extractall(path)
-
-    import platform
-    system_info = platform.architecture()
-
-    if system_info[1] == 'WindowsPE':
-        path =  __file__[:-11].replace('\\', '/')
-        path = path[0].lower() + path[2:]
-        path = '/mnt/' + path + 'pdf2svg/'
-    
-    elif system_info[1] == 'ELF':
-        path = __file__[:-11] + 'pdf2svg/'
-    
-    else:
-        os.rmdir(os.path.join(__file__[:-11], 'pdf2svg'))
-        raise SystemError("error detecting system information:", system_info)
-
-    with open(os.path.join(__file__[:-11], 'pdf2svg') + "/install.sh", "w", encoding='utf-8') as f:
-        f.writelines("chmod 755 -R " + path + " && " +
-                    "cd " + path + "pdf2svg-master/ && " +
-                    "./configure --prefix=" + path + " && " +
-                    "make && " +
-                    "make install")
-    os.system("bash " + path + "install.sh")
-
-    '''
-    import re, platform
+    import re, platform, zipfile
     system_info = platform.architecture()
 
     if system_info[1] == 'WindowsPE':
@@ -124,15 +89,31 @@ def install_pdf2svg():
                 download(url, Path(os.path.join(path, file[-1])))
             except:
                 os.rmdir(path)
+        print("set PATH=%PATH%" + path)
+        os.system("set PATH=%PATH%" + path)
     
     elif system_info[1] == 'ELF':
-        os.rmdir(path)
-        raise SystemError("error detecting system information:", system_info)
+        url = "https://github.com/dawbarton/pdf2svg/archive/refs/heads/master.zip"
+        print("Downloading pdf2svg.zip...")
+        path = os.path.join(__file__[:-11], 'pdf2svg.zip')
+        download(url, Path(path))
+
+        zip_file = zipfile.ZipFile(path, 'r')
+        path = os.path.join(__file__[:-11], 'pdf2svg')
+        zip_file.extractall(path)
+        path = __file__[:-11] + 'pdf2svg/'
+
+        with open(os.path.join(__file__[:-11], 'pdf2svg') + "/install.sh", "w", encoding='utf-8') as f:
+            f.writelines("chmod 755 -R " + path + " && " +
+                        "cd " + path + "pdf2svg-master/ && " +
+                        "./configure --prefix=" + path + " && " +
+                        "make && " +
+                        "make install")
+        os.system("bash " + path + "install.sh")
 
     else:
         os.rmdir(path)
         raise SystemError("error detecting system information:", system_info)
-    '''
 
 def check_optional():
     
