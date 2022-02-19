@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: graph2img
-Version: 1.2.1
+Version: 1.2.2
 Summary: graph2img: convert a graph to a png file.
 Home-page: https://github.com/ForwardStar/graph_drawer
 Author: Haoxuan Xie
@@ -53,7 +53,7 @@ Or to draw a tree:
 
 This will return a tree:
 
-![](https://github.com/ForwardStar/graph_drawer/blob/main/graph_tree.png)
+![](https://raw.githubusercontent.com/ForwardStar/graph_drawer/main/graph_tree.png)
 
 # Options
 

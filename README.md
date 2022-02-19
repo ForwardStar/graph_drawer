@@ -37,7 +37,7 @@ Or to draw a tree:
 
 This will return a tree:
 
-![](https://github.com/ForwardStar/graph_drawer/blob/main/graph_tree.png)
+![](https://raw.githubusercontent.com/ForwardStar/graph_drawer/main/graph_tree.png)
 
 # Options
 
