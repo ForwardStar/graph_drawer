@@ -111,7 +111,7 @@ def check_optional():
                 save_temp_files = True
                 sys.argv.remove(argv)
             elif argv.startswith('--output-format='):
-                output_format = argv[9:]
+                output_format = argv[16:]
                 sys.argv.remove(argv)
             else:
                 print("Unrecognized interpreter option:", argv)
