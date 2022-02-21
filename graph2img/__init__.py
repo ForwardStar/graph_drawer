@@ -15,8 +15,9 @@ def check_optional():
 
     for argv in sys.argv:
         if argv.startswith('--'):
-            if argv == '--save-temp-files=true':
-                save_temp_files = True
+            if argv.startswith('--save-temp-files='):
+                if argv == '--save-temp-files=true':
+                    save_temp_files = True
                 argv_remove_list.append(argv)
             elif argv.startswith('--temp-path='):
                 temp_path = argv[12:]
@@ -27,13 +28,10 @@ def check_optional():
             elif argv.startswith('--shape='):
                 shape = argv[8:]
                 argv_remove_list.append(argv)
-            elif argv == 'show==false':
-                show = False
+            elif argv.startswith('--show='):
+                if argv == '--show=false':
+                    show = False
                 argv_remove_list.append(argv)
-                sys.argv.remove(argv)
-            elif argv.startswith('--show=false'):
-                show = False
-                sys.argv.remove(argv)
             else:
                 print("Unrecognized interpreter option:", argv)
                 exit()
