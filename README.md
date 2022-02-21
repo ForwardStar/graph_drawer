@@ -5,14 +5,16 @@
 ```sh
 # Ubuntu
 sudo apt-get install texlive-xetex
-sudo apt-get install pdf2svg
+sudo apt-get install poppler-utils
 ```
 
 ```sh
 # CentOS
 yum install texlive-xetex
-yum install pdf2svg
+yum install poppler-utils
 ```
+
+For Windows, you only need to install texlive directly.
 
 # Installation by pip
 
@@ -58,6 +60,7 @@ This will return a tree:
 # Options
 
 Several options are provided:
+Three options are provided:
 ```
 --save-temp-files=true/false
 --temp-path=[path]

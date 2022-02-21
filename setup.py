@@ -19,10 +19,7 @@ setuptools.setup(
   "License :: OSI Approved :: MIT License",
   "Operating System :: OS Independent",
   ],
-  install_requires=['pdf2image>=1.6.0',
-                    'tqdm>=4.62.3',
-                    'pathlib2>=2.3.6',
-                    'requests>=2.27.1'],
+  install_requires=['pdf2image>=1.6.0'],
   python_requires='>=3.6',
   entry_points={
       'console_scripts': [

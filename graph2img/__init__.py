@@ -3,118 +3,6 @@ from ._generate_LaTeX_code import LaTeXCode
 import sys
 import os
 
-headers = {'User-Agent':'Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.6) Gecko/20091201 Firefox/3.5.6'}
-
-def download(url, path):
-
-    from tqdm import tqdm
-    from urllib.request import urlopen, Request
-    blocksize = 1024 * 8
-    blocknum = 0
-    retry_times = 0
-    while True:
-        try:
-            with urlopen(Request(url, headers=headers), timeout=3) as resp:
-                total = resp.info().get("content-length", None)
-                with tqdm(
-                    unit="B",
-                    unit_scale=True,
-                    miniters=1,
-                    unit_divisor=1024,
-                    total=total if total is None else int(total),
-                ) as t, path.open("wb") as f:
-                    block = resp.read(blocksize)
-                    while block:
-                        f.write(block)
-                        blocknum += 1
-                        t.update(len(block))
-                        block = resp.read(blocksize)
-            break
-        except KeyboardInterrupt:
-            if path.is_file():
-                path.unlink()
-            raise
-        except:
-            retry_times += 1
-            if retry_times >= 20:
-                break
-            print("Timed out, retrying...")
-    if retry_times >= 20:
-        if path.is_file():
-            path.unlink()
-        raise ConnectionError("bad internet connection, check it and retry.")
-
-
-def install_pdf2svg():
-
-    print("Installing necessary components...")
-
-    try:
-        import requests
-    except:
-        print("Installing dependencies...")
-        try:
-            from pip._internal import main
-            main(['install', 'requests'])
-        except:
-            os.system("pip3 install requests")
-        import requests
-
-    from pathlib2 import Path
-    import re, platform, zipfile
-    system_info = platform.architecture()
-
-    if system_info[1] == 'WindowsPE':
-        path = os.path.join(__file__[:-11], 'pdf2svg')
-        base_url = "https://github.com/jalios/pdf2svg-windows/tree/master/"
-        reg = None
-        if system_info[0] == '32bit':
-            base_url += "dist-32bits"
-            reg = r'/jalios/pdf2svg-windows/blob/master/dist-32bits/[\w\-\_\+]+\.dll|/jalios/pdf2svg-windows/blob/master/dist-32bits/[\w\-\_\+]+\.exe'
-        elif system_info[0] == '64bit':
-            base_url += "dist-64bits"
-            reg = r'/jalios/pdf2svg-windows/blob/master/dist-64bits/[\w\-\_\+]+\.dll|/jalios/pdf2svg-windows/blob/master/dist-64bits/[\w\-\_\+]+\.exe'
-        else:
-            os.rmdir(path)
-            raise SystemError("error detecting system information:", system_info)
-        
-        web_contents = requests.session().get(base_url, headers=headers).content.decode('utf-8')
-        files = re.compile(reg).findall(web_contents)
-        for file in files:
-            file = file.replace('blob', 'raw')
-            url = "https://github.com" + file
-            file = file.split('/')
-            try:
-                print("Downloading", file[-1])
-                download(url, Path(os.path.join(path, file[-1])))
-            except:
-                os.rmdir(path)
-        print("set PATH=%PATH%" + path)
-        os.system("set PATH=%PATH%" + path)
-    
-    elif system_info[1] == 'ELF':
-        url = "https://github.com/dawbarton/pdf2svg/archive/refs/heads/master.zip"
-        print("Downloading pdf2svg.zip...")
-        path = os.path.join(__file__[:-11], 'pdf2svg.zip')
-        download(url, Path(path))
-
-        zip_file = zipfile.ZipFile(path, 'r')
-        path = os.path.join(__file__[:-11], 'pdf2svg')
-        zip_file.extractall(path)
-        path = __file__[:-11] + 'pdf2svg/'
-
-        with open(os.path.join(__file__[:-11], 'pdf2svg') + "/install.sh", "w", encoding='utf-8') as f:
-            f.writelines("chmod 755 -R " + path + " && " +
-                        "cd " + path + "pdf2svg-master/ && " +
-                        "./configure --prefix=" + path + " && " +
-                        "make && " +
-                        "make install")
-        os.system("bash " + path + "install.sh")
-
-    else:
-        os.rmdir(path)
-        raise SystemError("error detecting system information:", system_info)
-
 def check_optional():
     
     save_temp_files = False
@@ -123,6 +11,7 @@ def check_optional():
     shape = "circle"
     show = True
     argv_remove_list = []
+    show = True
 
     for argv in sys.argv:
         if argv.startswith('--'):
@@ -141,6 +30,10 @@ def check_optional():
             elif argv == 'show==false':
                 show = False
                 argv_remove_list.append(argv)
+                sys.argv.remove(argv)
+            elif argv.startswith('--show=false'):
+                show = False
+                sys.argv.remove(argv)
             else:
                 print("Unrecognized interpreter option:", argv)
                 exit()
@@ -251,6 +144,7 @@ def generate_figure(tempPath, output_format):
             os.system("pdf2svg " + pdfPath + " " + sys.argv[2] + " all")
         else:
             os.system("pdf2svg " + pdfPath + " graph.svg all")
+        os.system("pdftocairo -svg temp/graph.pdf graph.svg")
 
     if output_format == 'png':
         try:
@@ -291,7 +185,7 @@ def main(save_temp_files=False, temp_path='temp', output_format='png', shape="ci
             os.remove(os.path.join(tempPath, file))
         os.rmdir(tempPath)
 
-    if output_format == 'png':
+    if show and output_format == 'png':
         from PIL import Image
         if len(sys.argv) >= 3:
             img = Image.open(sys.argv[2])
