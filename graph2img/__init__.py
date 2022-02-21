@@ -1,4 +1,4 @@
-__version__ = "1.2.15"
+__version__ = "1.2.16"
 __year__ = 2022
 
 from ._graph_functions import isTree
@@ -62,12 +62,12 @@ def check_optional():
     return save_temp_files, temp_path, output_format, shape, pop_up
 
 
-def read_graph():
+def read_graph(input_file):
 
     EdgeSet = []
 
     try:
-        GraphFile = "graph.txt"
+        GraphFile = input_file
         if len(sys.argv) >= 2:
             GraphFile = sys.argv[1]
         with open(GraphFile, "r") as f:
@@ -140,16 +140,12 @@ def generate_temp_path(temp_path, completeLaTeXCode):
     return tempPath
 
 
-def generate_figure(tempPath, output_format):
+def generate_figure(tempPath, output_format, output_file):
 
     pdfPath = os.path.join(tempPath, "graph.pdf").replace('\\', '/')
     infoPath = os.path.join(tempPath, "info.log").replace('\\', '/')
 
     if output_format == 'svg':
-        # path = os.path.join(__file__[:-11], 'pdf2svg')
-        # if not os.path.exists(path):
-        #    os.mkdir(path)
-        #    install_pdf2svg()
         os.system("pdf2svg > " + infoPath)
         with open(infoPath, "r", encoding='utf-8') as file:
             if not file.readline().startswith('Usage'):
@@ -157,7 +153,7 @@ def generate_figure(tempPath, output_format):
         if len(sys.argv) >= 3:
             os.system("pdf2svg " + pdfPath + " " + sys.argv[2] + " all")
         else:
-            os.system("pdf2svg " + pdfPath + " graph.svg all")
+            os.system("pdf2svg " + pdfPath + " " + output_file + ".svg all")
 
     if output_format == 'png':
         try:
@@ -177,21 +173,21 @@ def generate_figure(tempPath, output_format):
                 if len(sys.argv) >= 3:
                     image.save(sys.argv[2], 'PNG')
                 else:
-                    image.save("graph.png", 'PNG')
+                    image.save(output_file + ".png", 'PNG')
 
 
-def main(save_temp_files=False, temp_path='temp', output_format='png', shape="circle", pop_up=True):
+def main(save_temp_files=False, temp_path='temp', output_format='png', shape="circle", pop_up=True, input_file='graph.txt', output_file='graph'):
 
     if save_temp_files == False and temp_path == 'temp' and output_format == 'png' and shape == "circle" and pop_up:
         save_temp_files, temp_path, output_format, shape, pop_up = check_optional()
     
-    EdgeSet = read_graph()
+    EdgeSet = read_graph(input_file)
 
     completeLaTeXCode = generate_code(EdgeSet, shape)
 
     tempPath = generate_temp_path(temp_path, completeLaTeXCode)
 
-    generate_figure(tempPath, output_format)
+    generate_figure(tempPath, output_format, output_file)
 
     if not save_temp_files:
         for file in os.listdir(tempPath):
@@ -203,5 +199,5 @@ def main(save_temp_files=False, temp_path='temp', output_format='png', shape="ci
         if len(sys.argv) >= 3:
             img = Image.open(sys.argv[2])
         else:
-            img = Image.open("graph.png")
+            img = Image.open(output_file + ".png")
         img.show()
