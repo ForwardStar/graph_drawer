@@ -59,21 +59,28 @@ This will return a tree:
 
 # Options
 
+You can run the program by the following command:
+```sh
+graph2img <input_file> <output_file>
+```
+
 Several options are provided:
 Three options are provided:
 ```
 --save-temp-files=true/false
 --temp-path=[path]
 --output-format=png/svg
---output-file=[path]
 --show=true/false
+--help
 ```
 
 If you want to save the temporary files (like tex codes), set ``--save-temp-files`` as ``true``;
 
 If you want to generate a svg format image, set ``-output-format`` as ``svg``;
 
-If your system does not have a user interface, set ``--show`` as ``false``.
+If your system does not have a user interface, set ``--show`` as ``false``;
+
+To show all options, run ``graph2img --help``.
 
 # Installation from source
 

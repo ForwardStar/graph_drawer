@@ -1,3 +1,6 @@
+__version__ = "1.2.15"
+__year__ = 2022
+
 from ._graph_functions import isTree
 from ._generate_LaTeX_code import LaTeXCode
 import sys
@@ -9,11 +12,24 @@ def check_optional():
     temp_path = 'temp'
     output_format = 'png'
     shape = "circle"
-    show = True
+    pop_up = True
     argv_remove_list = []
-    show = True
 
     for argv in sys.argv:
+        if argv == "--version" or argv == "-v":
+            print("graph2img:", __version__, "(" + str(__year__) + ")")
+            exit()
+        if argv == "--help" or argv == "-help" or argv == "-h":
+            print("Usage:", "graph2img [options]* <input_file> <output_file>")
+            print("[options]:")
+            print("   -v, --version:                  print the version of the package")
+            print("   --help, -help, -h:              print help message")
+            print("   --temp-path=DIRECTORY:          set where the temporary files should be generated at")
+            print("   --save-temp-files=true/false:   set whether to save the temporary files")
+            print("   --output-format=png/svg:        set which format of image to be generated")
+            print("   --shape=circle/line/tree:       set the shape of the graph")
+            print("   --pop-up=true/false:            set whether to pop up the generated image")
+            exit()
         if argv.startswith('--'):
             if argv.startswith('--save-temp-files='):
                 if argv == '--save-temp-files=true':
@@ -28,9 +44,9 @@ def check_optional():
             elif argv.startswith('--shape='):
                 shape = argv[8:]
                 argv_remove_list.append(argv)
-            elif argv.startswith('--show='):
-                if argv == '--show=false':
-                    show = False
+            elif argv.startswith('--pop-up='):
+                if argv == '--pop-up=false':
+                    pop_up = False
                 argv_remove_list.append(argv)
             else:
                 print("Unrecognized interpreter option:", argv)
@@ -43,7 +59,7 @@ def check_optional():
         print("Unrecognized format:", output_format)
         exit()
     
-    return save_temp_files, temp_path, output_format, shape, show
+    return save_temp_files, temp_path, output_format, shape, pop_up
 
 
 def read_graph():
@@ -84,7 +100,10 @@ def generate_code(EdgeSet, shape="circle"):
 
     completeLaTeXCode = ""
 
-    if isTree(EdgeSet) and shape == "tree":
+    if shape == "tree":
+        if not isTree(EdgeSet):
+            print("The input is not a tree.")
+            exit()
         root = EdgeSet[0][0]
         completeLaTeXCode = LaTeXCode(EdgeSet, isTree=True, root=root)
     else:
@@ -161,10 +180,10 @@ def generate_figure(tempPath, output_format):
                     image.save("graph.png", 'PNG')
 
 
-def main(save_temp_files=False, temp_path='temp', output_format='png', shape="circle", show=True):
+def main(save_temp_files=False, temp_path='temp', output_format='png', shape="circle", pop_up=True):
 
-    if save_temp_files == False and temp_path == 'temp' and output_format == 'png' and shape == "circle" and show:
-        save_temp_files, temp_path, output_format, shape, show = check_optional()
+    if save_temp_files == False and temp_path == 'temp' and output_format == 'png' and shape == "circle" and pop_up:
+        save_temp_files, temp_path, output_format, shape, pop_up = check_optional()
     
     EdgeSet = read_graph()
 
@@ -179,7 +198,7 @@ def main(save_temp_files=False, temp_path='temp', output_format='png', shape="ci
             os.remove(os.path.join(tempPath, file))
         os.rmdir(tempPath)
 
-    if show and output_format == 'png':
+    if pop_up and output_format == 'png':
         from PIL import Image
         if len(sys.argv) >= 3:
             img = Image.open(sys.argv[2])
