@@ -1,0 +1,3 @@
+[console_scripts]
+graph2img = graph2img:main
+
