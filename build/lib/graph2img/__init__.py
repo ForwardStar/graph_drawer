@@ -141,7 +141,6 @@ def generate_figure(tempPath, output_format):
             os.system("pdf2svg " + pdfPath + " " + sys.argv[2] + " all")
         else:
             os.system("pdf2svg " + pdfPath + " graph.svg all")
-        os.system("pdftocairo -svg temp/graph.pdf graph.svg")
 
     if output_format == 'png':
         try:
