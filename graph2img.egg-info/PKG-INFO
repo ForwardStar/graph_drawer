@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: graph2img
-Version: 1.2.7
+Version: 1.2.8
 Summary: graph2img: convert a graph to a png file.
 Home-page: https://github.com/ForwardStar/graph_drawer
 Author: Haoxuan Xie
@@ -21,14 +21,16 @@ License-File: LICENSE
 ```sh
 # Ubuntu
 sudo apt-get install texlive-xetex
-sudo apt-get install pdf2svg
+sudo apt-get install poppler-utils
 ```
 
 ```sh
 # CentOS
 yum install texlive-xetex
-yum install pdf2svg
+yum install poppler-utils
 ```
+
+For Windows, you only need to install texlive directly.
 
 # Installation by pip
 

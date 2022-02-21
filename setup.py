@@ -5,7 +5,7 @@ with open("README.md", "r", encoding='utf-8') as fh:
 
 setuptools.setup(
   name="graph2img",
-  version="1.2.7",
+  version="1.2.8",
   author="Haoxuan Xie",
   author_email="haoxuanxie@link.cuhk.edu.cn",
   url="https://github.com/ForwardStar/graph_drawer",
@@ -19,10 +19,7 @@ setuptools.setup(
   "License :: OSI Approved :: MIT License",
   "Operating System :: OS Independent",
   ],
-  install_requires=['pdf2image>=1.6.0',
-                    'tqdm>=4.62.3',
-                    'pathlib2>=2.3.6',
-                    'requests>=2.27.1'],
+  install_requires=['pdf2image>=1.6.0'],
   python_requires='>=3.6',
   entry_points={
       'console_scripts': [
