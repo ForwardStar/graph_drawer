@@ -118,25 +118,41 @@ def install_pdf2svg():
 def check_optional():
     
     save_temp_files = False
+    temp_path = 'temp'
     output_format = 'png'
+    shape = "circle"
+    show = True
+    argv_remove_list = []
 
     for argv in sys.argv:
         if argv.startswith('--'):
             if argv == '--save-temp-files=true':
                 save_temp_files = True
-                sys.argv.remove(argv)
+                argv_remove_list.append(argv)
+            elif argv.startswith('--temp-path='):
+                temp_path = argv[12:]
+                argv_remove_list.append(argv)
             elif argv.startswith('--output-format='):
                 output_format = argv[16:]
-                sys.argv.remove(argv)
+                argv_remove_list.append(argv)
+            elif argv.startswith('--shape='):
+                shape = argv[8:]
+                argv_remove_list.append(argv)
+            elif argv == 'show==false':
+                show = False
+                argv_remove_list.append(argv)
             else:
                 print("Unrecognized interpreter option:", argv)
                 exit()
+
+    for argv in argv_remove_list:
+        sys.argv.remove(argv)
 
     if output_format != 'png' and output_format != 'svg':
         print("Unrecognized format:", output_format)
         exit()
     
-    return save_temp_files, output_format
+    return save_temp_files, temp_path, output_format, shape, show
 
 
 def read_graph():
@@ -173,24 +189,21 @@ def read_graph():
     return EdgeSet
 
 
-def generate_code(EdgeSet):
+def generate_code(EdgeSet, shape="circle"):
 
     completeLaTeXCode = ""
 
-    if isTree(EdgeSet) and input("This is a tree. Do you want to draw it as a tree structure? (y/n) ").strip() == 'y':
+    if isTree(EdgeSet) and shape == "tree":
         try:
             root = input("Input the root node: ").strip()
         except:
             root = None
         completeLaTeXCode = LaTeXCode(EdgeSet, isTree=True, root=root)
     else:
-        if input("Draw in a circle or a line? (circle/line): ").strip() == "line":
+        if shape == "line":
             completeLaTeXCode = LaTeXCode(EdgeSet, isLine=True)
         else:
-            try:
-                radius = int(input("Input the radius of the graph: "))
-            except:
-                radius = 3
+            radius = 3
             completeLaTeXCode = LaTeXCode(EdgeSet, radius)
 
     return "\\documentclass[tikz]{standalone}\n" \
@@ -200,36 +213,44 @@ def generate_code(EdgeSet):
         + "\end{document}\n"
 
 
-def generate_temp_path(completeLaTeXCode):
+def generate_temp_path(temp_path, completeLaTeXCode):
     
-    tempPath = 'temp'
+    tempPath = temp_path
+    texPath = os.path.join(tempPath, "graph.tex").replace('\\', '/')
+    infoPath = os.path.join(tempPath, "info.log").replace('\\', '/')
 
     if not os.path.exists(tempPath):
         os.mkdir(tempPath)
-    with open("temp/graph.tex", "w") as f:
+    with open(texPath, "w") as f:
         f.writelines(completeLaTeXCode)
 
-    os.system("xelatex --version > temp/info.log")
-    with open("temp/info.log", "r", encoding='utf-8') as file:
+    os.system("xelatex --version > " + infoPath)
+    with open(infoPath, "r", encoding='utf-8') as file:
         if "XeTeX" not in str(file.readline()):
             raise ModuleNotFoundError("xelatex not found on your machine!")
-    os.system("xelatex -output-directory=temp temp/graph.tex > temp/info.log")
+    os.system("xelatex -output-directory=" + tempPath + " " + texPath + " > " + infoPath)
 
     return tempPath
 
 
 def generate_figure(tempPath, output_format):
 
+    pdfPath = os.path.join(tempPath, "graph.pdf").replace('\\', '/')
+    infoPath = os.path.join(tempPath, "info.log").replace('\\', '/')
+
     if output_format == 'svg':
-        path = os.path.join(__file__[:-11], 'pdf2svg')
-        if not os.path.exists(path):
-            os.mkdir(path)
-            install_pdf2svg()
-        os.system("pdf2svg > temp/info.log")
-        with open("temp/info.log", "r", encoding='utf-8') as file:
+        # path = os.path.join(__file__[:-11], 'pdf2svg')
+        # if not os.path.exists(path):
+        #    os.mkdir(path)
+        #    install_pdf2svg()
+        os.system("pdf2svg > " + infoPath)
+        with open(infoPath, "r", encoding='utf-8') as file:
             if not file.readline().startswith('Usage'):
                 raise ModuleNotFoundError("pdf2svg not found on your machine, install from https://github.com/dawbarton/pdf2svg before use.")
-        os.system("pdf2svg temp/graph.pdf graph.svg all")
+        if len(sys.argv) >= 3:
+            os.system("pdf2svg " + pdfPath + " " + sys.argv[2] + " all")
+        else:
+            os.system("pdf2svg " + pdfPath + " graph.svg all")
 
     if output_format == 'png':
         try:
@@ -243,22 +264,25 @@ def generate_figure(tempPath, output_format):
                 os.system("pip3 install pdf2image")
             from pdf2image import convert_from_path
 
-        images_from_path = convert_from_path("temp/graph.pdf", output_folder=tempPath, dpi=360)
+        images_from_path = convert_from_path(pdfPath, output_folder=tempPath, dpi=360)
         for image in images_from_path:
             if images_from_path.index(image) == 1:
-                image.save("graph.png", 'PNG')
+                if len(sys.argv) >= 3:
+                    image.save(sys.argv[2], 'PNG')
+                else:
+                    image.save("graph.png", 'PNG')
 
 
-def main(save_temp_files=False, output_format='png'):
+def main(save_temp_files=False, temp_path='temp', output_format='png', shape="circle", show=True):
 
-    if save_temp_files == False and output_format == 'png':
-        save_temp_files, output_format = check_optional()
+    if save_temp_files == False and temp_path == 'temp' and output_format == 'png' and shape == "circle" and show:
+        save_temp_files, temp_path, output_format, shape, show = check_optional()
     
     EdgeSet = read_graph()
 
-    completeLaTeXCode = generate_code(EdgeSet)
+    completeLaTeXCode = generate_code(EdgeSet, shape)
 
-    tempPath = generate_temp_path(completeLaTeXCode)
+    tempPath = generate_temp_path(temp_path, completeLaTeXCode)
 
     generate_figure(tempPath, output_format)
 
@@ -269,5 +293,8 @@ def main(save_temp_files=False, output_format='png'):
 
     if output_format == 'png':
         from PIL import Image
-        img = Image.open("graph.png")
+        if len(sys.argv) >= 3:
+            img = Image.open(sys.argv[2])
+        else:
+            img = Image.open("graph.png")
         img.show()

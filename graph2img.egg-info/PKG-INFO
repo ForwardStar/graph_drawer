@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: graph2img
-Version: 1.2.7
+Version: 1.2.10
 Summary: graph2img: convert a graph to a png file.
 Home-page: https://github.com/ForwardStar/graph_drawer
 Author: Haoxuan Xie
@@ -73,15 +73,20 @@ This will return a tree:
 
 # Options
 
-Two options are provided:
+Several options are provided:
 ```
 --save-temp-files=true/false
+--temp-path=[path]
 --output-format=png/svg
+--output-file=[path]
+--show=true/false
 ```
 
 If you want to save the temporary files (like tex codes), set ``--save-temp-files`` as ``true``;
 
-If you want to generate a svg format image, set ``-output-format`` as ``svg``.
+If you want to generate a svg format image, set ``-output-format`` as ``svg``;
+
+If your system does not have a user interface, set ``--show`` as ``false``.
 
 # Installation from source
 
