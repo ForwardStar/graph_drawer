@@ -7,6 +7,7 @@ def check_optional():
     
     save_temp_files = False
     output_format = 'png'
+    show = True
 
     for argv in sys.argv:
         if argv.startswith('--'):
@@ -16,6 +17,9 @@ def check_optional():
             elif argv.startswith('--output-format='):
                 output_format = argv[16:]
                 sys.argv.remove(argv)
+            elif argv.startswith('--show=false'):
+                show = False
+                sys.argv.remove(argv)
             else:
                 print("Unrecognized interpreter option:", argv)
                 exit()
@@ -24,7 +28,7 @@ def check_optional():
         print("Unrecognized format:", output_format)
         exit()
     
-    return save_temp_files, output_format
+    return save_temp_files, output_format, show
 
 
 def read_graph():
@@ -129,10 +133,10 @@ def generate_figure(tempPath, output_format):
                 image.save("graph.png", 'PNG')
 
 
-def main(save_temp_files=False, output_format='png'):
+def main(save_temp_files=False, output_format='png', show=True):
 
     if save_temp_files == False and output_format == 'png':
-        save_temp_files, output_format = check_optional()
+        save_temp_files, output_format, show = check_optional()
     
     EdgeSet = read_graph()
 
@@ -147,7 +151,7 @@ def main(save_temp_files=False, output_format='png'):
             os.remove(os.path.join(tempPath, file))
         os.rmdir(tempPath)
 
-    if output_format == 'png':
+    if show and output_format == 'png':
         from PIL import Image
         img = Image.open("graph.png")
         img.show()

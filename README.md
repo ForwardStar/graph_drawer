@@ -59,15 +59,18 @@ This will return a tree:
 
 # Options
 
-Two options are provided:
+Three options are provided:
 ```
 --save-temp-files=true/false
 --output-format=png/svg
+--show=true/false
 ```
 
 If you want to save the temporary files (like tex codes), set ``--save-temp-files`` as ``true``;
 
-If you want to generate a svg format image, set ``-output-format`` as ``svg``.
+If you want to generate a svg format image, set ``-output-format`` as ``svg``;
+
+If your system does not have a user interface, set ``--show`` as ``false``.
 
 # Installation from source
 
